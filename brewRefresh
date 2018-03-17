@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "Running brew update"
+brew update
+echo "Running brew outdated"
+hasOutdated=$(brew outdated)
+
+if [ ! -z "$hasOutdated" ]
+then
+  echo "Running brew upgrade"
+  brew upgrade
+  if [ $1 ]
+  then
+    echo "Running brew cleanup"
+    brew cleanup
+  fi
+  echo "Done!"
+else
+  echo "No outdated formulae found. Have a nice day!"
+fi
