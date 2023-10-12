@@ -1,17 +1,57 @@
 #!/bin/bash
+cleanup=false
+debug=false
+
+usage() {
+ echo "Usage: $0 [OPTIONS]"
+ echo "Options:"
+ echo " -h, --help      Display this help message"
+ echo " -d, --debug     Enable debug mode"
+ echo " -c, --cleanup   Enable brew cleanup"
+}
+
+while [ $# -gt 0 ]; do
+    case $1 in
+      -h | --help)
+        usage
+        exit 0 ;;
+      -c | --cleanup)
+        cleanup=true
+        ;;
+      -d | --debug)
+        debug=true ;;
+      *)
+        echo "Invalid option: $1" >&2
+        usage
+        exit 1 ;;
+    esac
+    shift
+  done
+
 echo "Running brew update"
-brew update
+if "$debug"
+then
+  brew update -dv
+else
+  brew update
+fi
 echo "Running brew outdated"
 hasOutdated=$(brew outdated)
-
-if [ ! -z "$hasOutdated" ]
+# -n "$hasOutdated" is true if the length of $hasOutdated is zero
+if [ -n "$hasOutdated" ]
 then
   echo "Running brew upgrade"
-  brew upgrade
-  if [ $1 ]
+  if "$debug"
+  then
+    brew upgrade -dv
+  else
+    brew upgrade
+  fi
+
+  if [ "$cleanup" = true ]
   then
     echo "Running brew cleanup"
-    brew cleanup
+    brew cleanup -s
   fi
   echo "Done!"
 else
